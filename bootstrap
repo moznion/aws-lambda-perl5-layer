@@ -6,17 +6,18 @@ use utf8;
 use HTTP::Tiny;
 use JSON::XS qw/decode_json encode_json/;
 
-my $task_root = $ENV{'LAMBDA_TASK_ROOT'} // die '$LAMBDA_TASK_ROOT is not found';
+my $task_root;
+BEGIN {
+    $task_root = $ENV{'LAMBDA_TASK_ROOT'};
+}
 use lib "${task_root}/local/lib/perl5"; # for vendoring
-
-my $aws_lambda_runtime_api = $ENV{'AWS_LAMBDA_RUNTIME_API'} // die '$AWS_LAMBDA_RUNTIME_API is not found';
 
 my ($handler, $func) = split(/[.]/, $ENV{'_HANDLER'}, 2);
 require "${task_root}/${handler}.pl";
 my $f = \&$func;
 
 my $http = HTTP::Tiny->new;
-
+my $aws_lambda_runtime_api = $ENV{'AWS_LAMBDA_RUNTIME_API'} // die '$AWS_LAMBDA_RUNTIME_API is not found';
 my $next_event_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/next";
 
 while (1) {
