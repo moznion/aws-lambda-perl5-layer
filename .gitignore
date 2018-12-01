@@ -1,0 +1,4 @@
+cpanfile.snapshot
+*.tar.gz
+*.zip
+local/

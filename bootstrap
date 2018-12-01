@@ -1,0 +1,47 @@
+#!/opt/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+use HTTP::Tiny;
+use JSON::XS qw/decode_json encode_json/;
+
+my $task_root = $ENV{'LAMBDA_TASK_ROOT'} // die '$LAMBDA_TASK_ROOT is not found';
+use lib "${task_root}/local/lib/perl5"; # for vendoring
+
+my $aws_lambda_runtime_api = $ENV{'AWS_LAMBDA_RUNTIME_API'} // die '$AWS_LAMBDA_RUNTIME_API is not found';
+
+my ($handler, $func) = split(/[.]/, $ENV{'_HANDLER'}, 2);
+require "${task_root}/${handler}.pl";
+my $f = \&$func;
+
+my $http = HTTP::Tiny->new;
+
+my $next_event_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/next";
+
+while (1) {
+    my $next_event_resp = $http->get($next_event_url);
+    unless ($next_event_resp->{success}) {
+        die "failed to retrieve the next event: $next_event_resp->{status} $next_event_resp->{reason}";
+    }
+
+    my $request_id = $next_event_resp->{headers}->{'lambda-runtime-aws-request-id'};
+    unless ($request_id) {
+        die 'cannot take the Lambda request ID';
+    }
+
+    my $payload = decode_json($next_event_resp->{content});
+    my $result = $f->($payload);
+
+    my $exec_resp_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/$request_id/response";
+    my $resp = $http->post($exec_resp_url, {
+        content => encode_json($result),
+    });
+
+    unless ($resp->{success}) {
+        die "failed to response of execution: $resp->{status} $resp->{reason}";
+    }
+}
+
+__END__
+
