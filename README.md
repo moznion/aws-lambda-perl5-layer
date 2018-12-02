@@ -54,9 +54,9 @@ sub handle {
 1; # must return TRUE value here!
 ```
 
-### How to solve dependencies
+### How to build a Lambda function with package vendoring?
 
-To Be Documented...
+Please refer to the following: https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple
 
 TODO
 --
