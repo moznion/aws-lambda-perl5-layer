@@ -3,6 +3,32 @@ aws-lambda-perl5-layer
 
 This repository provides the Perl5 layer for AWS Lambda with runtime API.
 
+Provided Layers
+--
+
+### ARN
+
+- `arn:aws:lambda:${REGION}:652718333417:layer:perl-5_26-layer:1`
+- `arn:aws:lambda:${REGION}:652718333417:layer:perl-5_28-layer:1`
+
+### Supported regions
+
+- ap-northeast-1
+- ap-northeast-2
+- ap-south-1
+- ap-southeast-1
+- ap-southeast-2
+- ca-central-1
+- eu-central-1
+- eu-west-1
+- eu-west-2
+- eu-west-3
+- sa-east-1
+- us-east-1
+- us-east-2
+- us-west-1
+- us-west-2
+
 How to build a layer
 --
 
@@ -84,11 +110,6 @@ $ make publish-docker-image CONTAINER_TAG=x.x DOCKER_ID_USER=xxx
 ```
 $ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x OPT='--no-cache'
 ```
-
-TODO
---
-
-- [ ] Publish a layer to AWS and provide ARN
 
 See Also
 --
