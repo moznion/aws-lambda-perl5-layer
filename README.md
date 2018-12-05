@@ -3,20 +3,29 @@ aws-lambda-perl5-layer
 
 This repository provides the Perl5 layer for AWS Lambda with runtime API.
 
-** This is under development **
-
 How to build a layer
 --
 
 ```
-$ make PERL_VERSION=x.x.x
+$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x
+$ make build CONTAINER_TAG=x.x
 ```
 
-Then this command stats to create a zip archive as `lambda-layer-perl-x.x.x.zip`.
+NOTE: `x.x.x` and `x.x` means perl runtime version (e.g. `5.28.1` and `5.28`). You can specify as you like.
 
-(NOTE: `x.x.x` means perl runtime version. You can specify as you like)
+Then this command stats to create a zip archive as `lambda-layer-perl-x.x.zip`.
 
-How to use
+--
+
+Or you can use pre-built docker container:
+
+```
+$ make build CONTAINER_TAG=x.x DOCKER_HUB_ACCOUNT='moznion/'
+```
+
+Please refer to the following so that getting available containers: https://hub.docker.com/r/moznion/lambda-perl-layer-foundation/
+
+How to use this layer
 --
 
 1. Register the built zip archive of layer as a layer.
@@ -26,6 +35,8 @@ How to use
 
 How to create a perl function
 --
+
+Please refer: [moznion/aws-lambda-perl5-layer-example](https://github.com/moznion/aws-lambda-perl5-layer-example)
 
 An example is shown below (`handler.pl`):
 
@@ -57,6 +68,22 @@ sub handle {
 ### How to build a Lambda function with package vendoring?
 
 Please refer to the following: https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple
+
+For Developers
+--
+
+### How to publish foundation docker container
+
+```
+$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x
+$ make publish-docker-image CONTAINER_TAG=x.x DOCKER_ID_USER=xxx
+```
+
+### How to build foundation docker container without caching
+
+```
+$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x OPT='--no-cache'
+```
 
 TODO
 --
