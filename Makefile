@@ -44,3 +44,11 @@ endif
 	docker tag lambda-perl-layer-foundation:$(CONTAINER_TAG) $(DOCKER_ID_USER)/lambda-perl-layer-foundation:$(CONTAINER_TAG)
 	docker push $(DOCKER_ID_USER)/lambda-perl-layer-foundation:$(CONTAINER_TAG)
 
+publish-lambda-layer:
+ifndef AWS_PROFILE
+	@echo '[ERROR] $$AWS_PROFILE must be specified'
+	@echo 'usage: make publish-lambda-layer AWS_PROFILE=xxx'
+	exit 255
+endif
+	./scripts/publish-layer.sh $(AWS_PROFILE)
+
