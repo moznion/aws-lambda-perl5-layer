@@ -3,15 +3,17 @@ aws-lambda-perl5-layer
 
 This repository provides the Perl5 layer for AWS Lambda with runtime API.
 
-Provided Layers
+How to use
 --
 
-### ARN
+### 1. Using provided layers
+
+#### ARN
 
 - `arn:aws:lambda:${REGION}:652718333417:layer:perl-5_26-layer:1`
 - `arn:aws:lambda:${REGION}:652718333417:layer:perl-5_28-layer:1`
 
-### Supported regions
+##### Supported regions
 
 - ap-northeast-1
 - ap-northeast-2
@@ -29,8 +31,11 @@ Provided Layers
 - us-west-1
 - us-west-2
 
-How to build a layer
---
+### 1'. Building a layer yourself
+
+If you want to build a layer and use that instead of provided layer, please follow the following sequence.
+
+#### How to build a layer
 
 ```
 $ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x
@@ -43,7 +48,7 @@ Then this command stats to create a zip archive as `lambda-layer-perl-x.x.zip`.
 
 --
 
-Or you can use pre-built docker container:
+Or you can use pre-built docker container (RECOMMENDED!):
 
 ```
 $ make build CONTAINER_TAG=x.x DOCKER_HUB_ACCOUNT='moznion/'
@@ -51,20 +56,21 @@ $ make build CONTAINER_TAG=x.x DOCKER_HUB_ACCOUNT='moznion/'
 
 Please refer to the following so that getting available containers: https://hub.docker.com/r/moznion/lambda-perl-layer-foundation/
 
-How to use this layer
---
+#### How to publish the layer
 
-1. Register the built zip archive of layer as a layer.
-2. Create a perl function
-  - If you register the handler as `handler.handle`, you have to write code into `handler.pl` file and it must have `handle` subroutine
-3. Enjoy :tada:
+```sh
+aws --region "$REGION" --profile "$PROFILE" lambda publish-layer-version \
+      --layer-name "perl-x.x" \
+      --zip-file "fileb://lambda-layer-perl-x.x.zip"
+```
 
-How to create a perl function
---
+### 2. Create a Lambda function and publish it
 
 Please refer: [moznion/aws-lambda-perl5-layer-example](https://github.com/moznion/aws-lambda-perl5-layer-example)
 
-An example is shown below (`handler.pl`):
+If you register the handler as `handler.handle`, you have to write code into `handler.pl` file and it must have `handle` subroutine.
+
+An simple example is below (`handler.pl`):
 
 ```perl
 #!perl
@@ -91,9 +97,16 @@ sub handle {
 1; # must return TRUE value here!
 ```
 
+And there is necessary to publish the function with layer information. Please refer to the following example: [How to publish a function](https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple#how-to-publish-a-function)
+
+FAQ
+--
+
 ### How to build a Lambda function with package vendoring?
 
-Please refer to the following: https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple
+You have to build a function zip with the perl runtime that is the same version as Lambda's one.
+
+Please refer: [https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple](https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple)
 
 For Developers
 --
