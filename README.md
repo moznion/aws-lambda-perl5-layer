@@ -129,7 +129,7 @@ See Also
 
 - https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html
 
-Authoer
+Author
 --
 
 moznion (<moznion@gmail.com>)
