@@ -32,10 +32,37 @@ while (1) {
     }
 
     my $payload = decode_json($next_event_resp->{content});
-    my $result = $f->($payload);
+
+    my $result;
+    eval {
+        $result = $f->($payload);
+    };
+    if ($@) {
+        # something went wrong on called function
+        # ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html#runtimes-api-invokeerror
+        my $err_message = $@;
+        my $error_resp_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/$request_id/error";
+        my $resp = $http->post($error_resp_url, {
+            headers => {
+                'Content-Type' => 'application/json',
+                'Lambda-Runtime-Function-Error-Type' => 'Unhandled',
+            },
+            content => encode_json({
+                errorMessage => $err_message,
+                errorType => "FunctionInvocationError",
+            }),
+        });
+        unless ($resp->{success}) {
+            die "failed to response of execution: $resp->{status} $resp->{reason}";
+        }
+        next;
+    }
 
     my $exec_resp_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/$request_id/response";
     my $resp = $http->post($exec_resp_url, {
+        headers => {
+            'Content-Type' => 'application/json',
+        },
         content => encode_json($result),
     });
 
