@@ -1,4 +1,4 @@
-FROM lambci/lambda:build
+FROM lambci/lambda:build-provided
 
 ARG PERL_VERSION
 RUN yum install -y zip curl
