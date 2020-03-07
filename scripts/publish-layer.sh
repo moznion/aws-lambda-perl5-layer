@@ -26,6 +26,7 @@ REGIONS=(
 PERL_VERSIONS=(
   '5.26'
   '5.28'
+  '5.30'
 )
 
 for PERL_VERSION in "${PERL_VERSIONS[@]}"; do
