@@ -38,7 +38,7 @@ If you want to build a layer and use that instead of provided layer, please foll
 #### How to build a layer
 
 ```
-$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x
+$ make build-docker-image PERL_VERSION=x.x.x CONTAINER_TAG=x.x
 $ make build CONTAINER_TAG=x.x
 ```
 
@@ -114,14 +114,14 @@ For Developers
 ### How to publish foundation docker container
 
 ```
-$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x
+$ make build-docker-image PERL_VERSION=x.x.x CONTAINER_TAG=x.x
 $ make publish-docker-image CONTAINER_TAG=x.x DOCKER_ID_USER=xxx
 ```
 
 ### How to build foundation docker container without caching
 
 ```
-$ make build-docker-container PERL_VERSION=x.x.x CONTAINER_TAG=x.x OPT='--no-cache'
+$ make build-docker-image PERL_VERSION=x.x.x CONTAINER_TAG=x.x OPT='--no-cache'
 ```
 
 See Also
