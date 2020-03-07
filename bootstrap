@@ -12,13 +12,35 @@ BEGIN {
 }
 use lib "${task_root}/local/lib/perl5"; # for vendoring
 
-my ($handler, $func) = split(/[.]/, $ENV{'_HANDLER'}, 2);
-require "${task_root}/${handler}.pl";
-my $f = \&$func;
-
 my $http = HTTP::Tiny->new;
 my $aws_lambda_runtime_api = $ENV{'AWS_LAMBDA_RUNTIME_API'} // die '$AWS_LAMBDA_RUNTIME_API is not found';
 my $next_event_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/invocation/next";
+
+my ($handler, $func) = split(/[.]/, $ENV{'_HANDLER'}, 2);
+eval {
+    require "${task_root}/${handler}.pl";
+};
+if ($@) {
+    # something went wrong on initiation
+    # ref: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html#runtimes-api-initerror
+    my $err_message = $@;
+    my $error_resp_url = "http://${aws_lambda_runtime_api}/2018-06-01/runtime/init/error";
+    my $resp = $http->post($error_resp_url, {
+        headers => {
+            'Content-Type' => 'application/json',
+            'Lambda-Runtime-Function-Error-Type' => 'Unhandled',
+        },
+        content => encode_json({
+            errorMessage => $err_message,
+            errorType => "FunctionInitiationError",
+        }),
+    });
+    unless ($resp->{success}) {
+        die "failed to response of failure initiation";
+    }
+    die $err_message;
+}
+my $f = \&$func;
 
 while (1) {
     my $next_event_resp = $http->get($next_event_url);
@@ -53,7 +75,7 @@ while (1) {
             }),
         });
         unless ($resp->{success}) {
-            die "failed to response of execution: $resp->{status} $resp->{reason}";
+            die "failed to response of failure execution: $request_id";
         }
         next;
     }
