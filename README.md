@@ -108,6 +108,19 @@ You have to build a function zip with the perl runtime that is the same version 
 
 Please refer: [https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple](https://github.com/moznion/aws-lambda-perl5-layer-example/tree/master/simple)
 
+### How should it do when the runtime complains "error while loading shared libraries: libXXX.so"?
+
+Probably this because of the Lambda runtime environment (i.e. base Linux).
+
+This lambda applies workaround that includes those missing shared libraries.
+
+Ref:
+
+- https://github.com/moznion/aws-lambda-perl5-layer/issues/6
+- https://github.com/moznion/aws-lambda-perl5-layer/commit/833ded09dd460ccba08bd4e176a9bc99ff4ec7e1
+
+However, I think this way is a little bit fragile... is there any good method?
+
 For Developers
 --
 
